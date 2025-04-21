@@ -3,60 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎵 Durée Musicale + Symbole de Note</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>🎵 Calculateur de Durée Musicale</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 650px;
+            margin-top: 2rem;
+            padding: 2rem;
+            background-color: #2a2a2a;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            color: #4d94ff;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .form-control, .form-select {
+            background-color: #333;
+            border: 1px solid #444;
+            color: #e0e0e0;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #404040;
+            color: #ffffff;
+            border-color: #4d94ff;
+            box-shadow: 0 0 0 0.25rem rgba(77, 148, 255, 0.25);
+        }
+        .btn-primary {
+            background-color: #4d94ff;
+            border-color: #4d94ff;
+        }
+        .btn-primary:hover {
+            background-color: #3a7acc;
+            border-color: #3a7acc;
+        }
+        .result-card {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+        .symbol-display {
+            font-size: 3rem;
+            text-align: center;
+            margin: 1rem 0;
+            color: #4d94ff;
+        }
+        label {
+            margin-top: 1rem;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>🎵 Calculateur de Durée Musicale</h1>
         
-        <div class="form-group">
-            <label for="mesures">Nombre de mesures :</label>
-            <input type="number" id="mesures" class="form-control" min="1" required>
-        </div>
-
-        <div class="form-group">
-            <label for="numerateur">Numérateur :</label>
-            <input type="number" id="numerateur" class="form-control" min="1" required>
-        </div>
-
-        <div class="form-group">
-            <label for="denominateur">Dénominateur :</label>
-            <input type="number" id="denominateur" class="form-control" min="1" required>
-        </div>
-
-        <div class="form-group">
-            <label for="note">Note du mouvement :</label>
-            <select id="note" class="form-control">
-                {% for note in notes %}
-                <option value="{{ note }}">{{ note }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="symbol-display">
-            <span id="symbole">Symbole : ❓</span>
-        </div>
-
-        <div class="form-group">
-            <label for="tempo">Tempo (BPM) :</label>
-            <input type="number" id="tempo" class="form-control" min="1" step="0.1" required>
-        </div>
-
-        <button id="calculer" class="btn-primary">Calculer la durée</button>
-
-        <div id="resultat" class="result-container hidden">
-            <h2>Résultat</h2>
-            <div class="result-box">
-                <p>🕰️ <span id="millenaires">0</span> millénaire(s)</p>
-                <p>🗿 <span id="centuries">0</span> siècle(s)</p>
-                <p>📅 <span id="years">0</span> année(s), <span id="months">0</span> mois, <span id="days">0</span> jour(s)</p>
-                <p>⏰ <span id="hours">0</span>h <span id="minutes">0</span>min <span id="seconds">0</span>s <span id="milliseconds">0</span>ms</p>
+        <form id="calculForm">
+            <div class="mb-3">
+                <label for="mesures" class="form-label">Nombre de mesures :</label>
+                <input type="number" class="form-control" id="mesures" name="mesures" required min="1">
+            </div>
+            
+            <div class="mb-3">
+                <label for="numerateur" class="form-label">Numérateur :</label>
+                <input type="number" class="form-control" id="numerateur" name="numerateur" required min="1">
+            </div>
+            
+            <div class="mb-3">
+                <label for="denominateur" class="form-label">Dénominateur :</label>
+                <input type="number" class="form-control" id="denominateur" name="denominateur" required min="1">
+            </div>
+            
+            <div class="mb-3">
+                <label for="note" class="form-label">Note du mouvement :</label>
+                <select class="form-select" id="note" name="note" required>
+                    {% for note in notes %}
+                    <option value="{{ note }}">{{ note }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="symbol-display" id="symbolDisplay">❓</div>
+            
+            <div class="mb-3">
+                <label for="tempo" class="form-label">Tempo (BPM) :</label>
+                <input type="number" class="form-control" id="tempo" name="tempo" required min="1" step="0.01">
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">Calculer la durée</button>
+            </div>
+        </form>
+        
+        <div class="result-card" id="resultCard">
+            <h3 class="text-center mb-4">Résultat du calcul</h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <p>🕰️ <span id="millenaires">0</span> millénaire(s)</p>
+                    <p>🗿 <span id="centuries">0</span> siècle(s)</p>
+                    <p>📅 <span id="years">0</span> année(s)</p>
+                    <p>📅 <span id="months">0</span> mois</p>
+                    <p>📅 <span id="days">0</span> jour(s)</p>
+                </div>
+                <div class="col-md-6">
+                    <p>⏰ <span id="hours">0</span> heure(s)</p>
+                    <p>⏰ <span id="minutes">0</span> minute(s)</p>
+                    <p>⏰ <span id="seconds">0</span> seconde(s)</p>
+                    <p>⏰ <span id="milliseconds">0</span> ms</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculForm = document.getElementById('calculForm');
+            const noteSelect = document.getElementById('note');
+            const symbolDisplay = document.getElementById('symbolDisplay');
+            const resultCard = document.getElementById('resultCard');
+            
+            // Mettre à jour le symbole quand on change la note
+            noteSelect.addEventListener('change', function() {
+                updateSymbol(this.value);
+            });
+            
+            // Mettre à jour le symbole au chargement
+            updateSymbol(noteSelect.value);
+            
+            // Gérer la soumission du formulaire
+            calculForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    mesures: document.getElementById('mesures').value,
+                    numerateur: document.getElementById('numerateur').value,
+                    denominateur: document.getElementById('denominateur').value,
+                    note: noteSelect.value,
+                    tempo: document.getElementById('tempo').value
+                };
+                
+                fetch('/calculer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    
+                    // Afficher les résultats
+                    const duree = data.duree;
+                    document.getElementById('millenaires').textContent = duree.millenaires;
+                    document.getElementById('centuries').textContent = duree.centuries;
+                    document.getElementById('years').textContent = duree.years;
+                    document.getElementById('months').textContent = duree.months;
+                    document.getElementById('days').textContent = duree.days;
+                    document.getElementById('hours').textContent = duree.hours;
+                    document.getElementById('minutes').textContent = duree.minutes;
+                    document.getElementById('seconds').textContent = duree.seconds;
+                    document.getElementById('milliseconds').textContent = duree.milliseconds;
+                    
+                    // Afficher la carte de résultat
+                    resultCard.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue lors du calcul.');
+                });
+            });
+            
+            function updateSymbol(note) {
+                fetch('/get_symbol', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ note: note })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    symbolDisplay.textContent = data.symbole;
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    symbolDisplay.textContent = '❓';
+                });
+            }
+        });
+    </script>
 </body>
 </html> 

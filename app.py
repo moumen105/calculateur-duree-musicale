@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+import os
 
 app = Flask(__name__)
 
@@ -24,7 +25,7 @@ def convertir_en_valeur(note):
     }
     return notes.get(note.strip().lower(), None)
 
-# Dictionnaire des symboles musicaux
+# Dictionnaire des symboles musicaux (ronde → o, blanche → b)
 note_symbols = {
     'ronde': 'o',
     'blanche': 'b',
@@ -46,7 +47,7 @@ note_symbols = {
 }
 
 def convertir_en_unites_temps(duree_en_minutes):
-    millenaires = duree_en_minutes // (1000 * 12 * 30 * 24 * 60)
+    millenaires = duree_en_minutes // (1000 * 12 * 30 * 24 * 60)  # 1000 ans = 1 millénaire
     duree_en_minutes %= (1000 * 12 * 30 * 24 * 60)
     
     centuries = duree_en_minutes // (100 * 12 * 30 * 24 * 60)
@@ -118,4 +119,17 @@ def calculer():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    # Utiliser le port de l'environnement pour Render ou 29999 en local
+    port = int(os.environ.get("PORT", 29999))
+    
+    # En mode développement, afficher l'URL locale
+    if 'RENDER' not in os.environ:
+        print("\n\n" + "="*60)
+        print(f"Application accessible à l'adresse: http://127.0.0.1:{port}")
+        print("="*60 + "\n\n")
+    
+    # Activer le mode debug uniquement en local
+    debug = 'RENDER' not in os.environ
+    
+    # Démarrer l'application
+    app.run(host='0.0.0.0', debug=debug, port=port)
