@@ -1,119 +1,135 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎵 Calculateur de Durée Musicale</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #1a1a1a;
-            color: #e0e0e0;
-        }
-        .container {
-            max-width: 650px;
-            margin-top: 2rem;
-            padding: 2rem;
-            background-color: #2a2a2a;
-            border-radius: 15px;
-        }
-        h1 { color: #4d94ff; text-align: center; }
-        .form-control, .form-select {
-            background-color: #333;
-            color: #e0e0e0;
-        }
-        .btn-primary { background-color: #4d94ff; }
-        .result-card {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background-color: #333;
-            border-radius: 10px;
-            display: none;
-        }
-        .symbol-display {
-            font-size: 3rem;
-            text-align: center;
-            color: #4d94ff;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>🎵 Calculateur</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body { background:#1a1a1a; color:#e0e0e0; }
+.container { max-width:650px; margin-top:2rem; padding:2rem; background:#2a2a2a; border-radius:15px; }
+h1 { color:#4d94ff; text-align:center; }
+.form-control, .form-select { background:#333; color:#fff; }
+.result-card { margin-top:2rem; padding:1.5rem; background:#333; border-radius:10px; display:none; }
+.symbol-display { font-size:3rem; text-align:center; color:#4d94ff; }
+</style>
+
 </head>
 
 <body>
 <div class="container">
-    <h1>🎵 Calculateur de Durée Musicale</h1>
+<h1>🎵 Calculateur de Durée Musicale</h1>
 
-    <form id="calculForm">
+<form id="calculForm">
 
-        <input type="number" id="mesures" placeholder="Mesures" class="form-control mt-2" required>
-        <input type="number" id="numerateur" placeholder="Numérateur" class="form-control mt-2" required>
-        <input type="number" id="denominateur" placeholder="Dénominateur" class="form-control mt-2" required>
+<input type="number" id="mesures" class="form-control mt-2" placeholder="Mesures" required>
+<input type="number" id="numerateur" class="form-control mt-2" placeholder="Numérateur" required>
+<input type="number" id="denominateur" class="form-control mt-2" placeholder="Dénominateur" required>
 
-        <select id="note" class="form-select mt-2">
-            <option>ronde</option>
-            <option>blanche</option>
-            <option>noire</option>
-            <option>croche</option>
-            <option>double croche</option>
-        </select>
+<select id="note" class="form-select mt-2">
+<option>ronde</option>
+<option>blanche</option>
+<option>noire</option>
+<option>croche</option>
+<option>double croche</option>
+<option>triple croche</option>
+</select>
 
-        <div class="symbol-display" id="symbolDisplay">❓</div>
+<div class="symbol-display" id="symbolDisplay">❓</div>
 
-        <input type="number" id="tempo" placeholder="Tempo BPM" class="form-control mt-2" required>
+<input type="number" id="tempo" class="form-control mt-2" placeholder="Tempo" required>
 
-        <button class="btn btn-primary mt-3 w-100">Calculer</button>
-    </form>
+<button class="btn btn-primary mt-3 w-100">Calculer</button>
 
-    <div class="result-card" id="resultCard">
-        <h3>Résultat</h3>
-        <p>Minutes: <span id="minutes"></span></p>
-        <p>Secondes: <span id="seconds"></span></p>
-    </div>
+</form>
+
+<div class="result-card" id="resultCard">
+<h3 class="text-center">Résultat</h3>
+
+<p>🕰️ <span id="millenaires"></span></p>
+<p>🗿 <span id="centuries"></span></p>
+<p>📅 <span id="years"></span></p>
+<p>📅 <span id="months"></span></p>
+<p>📅 <span id="days"></span></p>
+<p>⏰ <span id="hours"></span></p>
+<p>⏰ <span id="minutes"></span></p>
+<p>⏰ <span id="seconds"></span></p>
+<p>⏰ <span id="milliseconds"></span></p>
+
+</div>
 </div>
 
 <script>
+
 const notes = {
-    'ronde': 1,
-    'blanche': 1/2,
-    'noire': 1/4,
-    'croche': 1/8,
-    'double croche': 1/16
+ 'ronde':1,'blanche':1/2,'noire':1/4,'croche':1/8,
+ 'double croche':1/16,'triple croche':1/32
 };
 
 const symbols = {
-    'ronde': 'o',
-    'blanche': 'b',
-    'noire': '♩',
-    'croche': '♪',
-    'double croche': '♫'
+ 'ronde':'o','blanche':'b','noire':'♩','croche':'♪',
+ 'double croche':'♫','triple croche':'♬'
 };
 
+function convertirTemps(min){
+ let ms = min*60*1000;
+
+ let millenaires = Math.floor(ms/(1000*365*24*60*60*1000));
+ ms %= (1000*365*24*60*60*1000);
+
+ let centuries = Math.floor(ms/(100*365*24*60*60*1000));
+ ms %= (100*365*24*60*60*1000);
+
+ let years = Math.floor(ms/(365*24*60*60*1000));
+ ms %= (365*24*60*60*1000);
+
+ let months = Math.floor(ms/(30*24*60*60*1000));
+ ms %= (30*24*60*60*1000);
+
+ let days = Math.floor(ms/(24*60*60*1000));
+ ms %= (24*60*60*1000);
+
+ let hours = Math.floor(ms/(60*60*1000));
+ ms %= (60*60*1000);
+
+ let minutes = Math.floor(ms/(60*1000));
+ ms %= (60*1000);
+
+ let seconds = Math.floor(ms/1000);
+ let milliseconds = ms%1000;
+
+ return {millenaires,centuries,years,months,days,hours,minutes,seconds,milliseconds};
+}
+
 document.getElementById("note").addEventListener("change", function(){
-    document.getElementById("symbolDisplay").textContent = symbols[this.value];
+ document.getElementById("symbolDisplay").textContent = symbols[this.value];
 });
 
 document.getElementById("calculForm").addEventListener("submit", function(e){
-    e.preventDefault();
+ e.preventDefault();
 
-    let mesures = parseFloat(document.getElementById("mesures").value);
-    let numerateur = parseFloat(document.getElementById("numerateur").value);
-    let denominateur = parseFloat(document.getElementById("denominateur").value);
-    let tempo = parseFloat(document.getElementById("tempo").value);
-    let note = document.getElementById("note").value;
+ let mesures = +mesures.value;
+ let numerateur = +numerateur.value;
+ let denominateur = +denominateur.value;
+ let tempo = +tempo.value;
+ let note = noteSelect.value;
 
-    let note_val = notes[note];
+ let note_val = notes[note];
 
-    let facteur = (1 / denominateur) / note_val;
-    let nouveau = numerateur * facteur;
-    let duree = (mesures * nouveau) / tempo;
+ let facteur = (1/denominateur)/note_val;
+ let nouveau = numerateur*facteur;
+ let duree = (mesures*nouveau)/tempo;
 
-    let minutes = Math.floor(duree);
-    let seconds = Math.floor((duree - minutes) * 60);
+ let res = convertirTemps(duree);
 
-    document.getElementById("minutes").textContent = minutes;
-    document.getElementById("seconds").textContent = seconds;
+ for(let key in res){
+  document.getElementById(key).textContent = res[key];
+ }
 
-    document.getElementById("resultCard").style.display = "block";
+ resultCard.style.display="block";
 });
+
 </script>
 
 </body>
